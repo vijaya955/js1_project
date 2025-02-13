@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indian Postal Code Information</title>
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7e309;
+      color: #333333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    h2 {
+      text-align: center;
+      color: #ff0000;
+    }
+    div {
+      display: grid;
+      gap: 20px;
+      width: 100%;
+      max-width: 600px;
+      background: #09c2ec;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+    div h2 {
+      padding: 20px;
+      background: #0cec1f;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    div > div {
+      display: grid;
+      gap: 10px;
+      padding: 10px 20px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      font-size: 16px;
+      height: 40px;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus {
+      border-color: #2b14f7;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+    button {
+      display: block;
+      width: 100%;
+      height: 40px;
+      background-color: #ff00b7;
+      color: rgb(14, 13, 13);
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:focus {
+      outline: none;
+    }
+    #result {
+      padding: 20px;
+      background: #f6290e;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      text-align: center;
+      font-size: 16px;
+      color: #495057;
+    }
+  </style>
+  <body>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const pincodeInput = document.getElementById("pincode");
+        const areaInput = document.getElementById("area");
+        const resultDiv = document.getElementById("result");
+        document.querySelectorAll("button")[0].addEventListener("click", () => {
+          const pincode = pincodeInput.value.trim();
+          if (pincode) {
+            fetchPincodeDetails(pincode);
+          } else {
+            resultDiv.innerHTML = "<p>Please enter a valid pincode.</p>";
+          }
+        });
+        document.querySelectorAll("button")[1].addEventListener("click", () => {
+          const area = areaInput.value.trim();
+          if (area) {
+            fetchAreaDetails(area);
+          } else {
+            resultDiv.innerHTML = "<p>Please enter a valid area name.</p>";
+          }
+        });
+        function fetchPincodeDetails(pincode) {
+          const apiUrl = `https://api.postalpincode.in/pincode/${pincode}`;
+          fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data[0].Status === "Success") {
+                console.log(data)
+                displayResults(data[0].PostOffice);
+              } else {
+                resultDiv.innerHTML = `<p>No results found for pincode: ${pincode}</p>`;
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching pincode data:", error);
+              resultDiv.innerHTML = `<p>Something went wrong. Please try again later.</p>`;
+            });
+        }
+        function fetchAreaDetails(area) {
+          const apiUrl = `https://api.postalpincode.in/postoffice/${area}`;
+          fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data[0].Status === "Success") {
+                displayResults(data[0].PostOffice);
+              } else {
+                resultDiv.innerHTML = `<p>No results found for area: ${area}</p>`;
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching area data:", error);
+              resultDiv.innerHTML = `<p>Something went wrong. Please try again later.</p>`;
+            });
+        }
+        function displayResults(postOffices) {
+          console.log(postOffices)
+          let output = "<h3>Search Results:</h3><ul>";
+          postOffices.forEach((postOffice) => {
+            output += `
+        <li>
+          <strong>Name:</strong> ${postOffice.Name}<br>
+          <strong>District:</strong> ${postOffice.District}<br>
+          <strong>State:</strong> ${postOffice.State}<br>
+          <strong>Pincode:</strong> ${postOffice.Pincode}
+        </li>
+      `;
+          });
+          output += "</ul>";
+          resultDiv.innerHTML = output;
+        }
+      });
+    </script>
+    <div>
+      <h2>Indian Postal Code Information Web App</h2>
+      <div>
+        <label for="pincode">Enter Pincode</label>
+        <input type="text" id="pincode" placeholder="Enter Pincode" />
+        <button>Search by Pincode</button>
+      </div>
+      <div>
+        <label for="area">Enter Area Name</label>
+        <input type="text" id="area" placeholder="Enter Area" />
+        <button>Search by Area</button>
+      </div>
+      <div id="result"></div>
+    </div>
+  </body>
+</html>
